@@ -18,22 +18,24 @@
  */
 
 #include <sourcemod>
-#include <ripext>
+#include <base64>
 #include <GameX>
 
 #pragma newdecls  required
 #pragma semicolon 1
 
-Handle      g_hCorePlugin;
+#define PLUGIN_VERSION  "0.0.0.2"
 
-HTTPClient  g_hWebClient;
-StringMap   g_hValues;
+stock Handle  g_hCorePlugin;
 
-char        g_szConfiguration[256];
+HTTPClient    g_hWebClient;
+StringMap     g_hValues;
+
+char          g_szConfiguration[256];
 
 public Plugin myinfo = {
   description = "SourceMod plugin for working with GameX",
-  version     = "0.0.0.1",
+  version     = PLUGIN_VERSION,
   author      = "CrazyHackGUT aka Kruzya",
   name        = "[GameX] Core",
   url         = "https://git.g-nation.ru/GameX"
@@ -60,5 +62,54 @@ public Action Cmd_ReloadGameX(int iArgC) {
   return Plugin_Handled;
 }
 
+public void OnAPICallFinished(HTTPResponse hResponse, DataPack hPack, const char[] szError) {
+  hPack.Reset();
+  Handle hPlugin = hPack.ReadCell();
+  GameXCall pFunction = view_as<GameXCall>(hPack.ReadFunction());
+  any data = hPack.ReadCell();
+  CloseHandle(hPack);
+
+  if (szError[0]) {
+    if (pFunction != INVALID_FUNCTION && IsValidPlugin(hPlugin)) {
+      Call_StartFunction(hPlugin, pFunction);
+      Call_PushCell(HTTPStatus_Invalid);
+      Call_PushCell(INVALID_HANDLE);
+      Call_PushString(szError);
+      Call_PushCell(data);
+      Call_Finish();
+    } else {
+      LogError("[GameX] Core failed when processing request: %s", szError);
+    }
+
+    return;
+  }
+
+  if (pFunction == INVALID_FUNCTION || !IsValidPlugin(hPlugin)) {
+    return;
+  }
+
+  Call_StartFunction(hPlugin, pFunction);
+  Call_PushCell(hResponse.Status);
+  Call_PushCell(hResponse.Data);
+  Call_PushNullString();
+  Call_PushCell(data);
+  Call_Finish();
+}
+
 #include "GameX/Configuration.sp"
 #include "GameX/API.sp"
+
+stock bool IsValidPlugin(Handle hPlugin) {
+  Handle hIter = GetPluginIterator();
+  bool bResult;
+
+  while (MorePlugins(hIter)) {
+    if (ReadPlugin(hIter) == hPlugin) {
+      bResult = (GetPluginStatus(hPlugin) == Plugin_Running);
+      break;
+    }
+  }
+
+  CloseHandle(hIter);
+  return bResult;
+}

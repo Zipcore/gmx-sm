@@ -28,7 +28,7 @@ static void Configuration_Start() {
 static void Configuration_HandleError(SMCError err, int iLine, int iCol) {
   char szError[256];
   if (!SMC_GetErrorString(err, szError, sizeof(szError)))
-    strcopy("Custom user error (see error logs for more details)", szError, sizeof(szError));
+    strcopy(szError, sizeof(szError), "Custom user error (see error logs for more details)");
   LogError("[GameX] Configuration loading failed: [%d] %s in %s (%d:%d)", err, szError, g_szConfiguration, iLine, iCol);
 
   Configuration_HandleCriticalError(err);
@@ -41,11 +41,11 @@ static void Configuration_HandleCriticalError(SMCError err) {
   SetFailState("[GameX] Configuration loading failed with fatal error. See error logs for more details. Error code: %d", err);
 }
 
-public SMCResult Configuration_OnEnterSection(SMCResult smc, const char[] szName, bool bOptQuotes) {
+public SMCResult Configuration_OnEnterSection(SMCParser smc, const char[] szName, bool bOptQuotes) {
   return SMCParse_Continue;
 }
 
-public SMCResult Configuration_OnLeaveSection(SMCResult smc) {
+public SMCResult Configuration_OnLeaveSection(SMCParser smc) {
   return SMCParse_Continue;
 }
 
@@ -57,7 +57,8 @@ public SMCResult Configuration_OnKeyValue(SMCParser smc, const char[] szKey, con
     }
 
     char szAuthHeader[1024];
-    FormatEx(szAuthHeader, sizeof(szAuthHeader), "Basic %s", szValue);
+    strcopy(szAuthHeader, sizeof(szAuthHeader), "Basic ");
+    EncodeBase64(szAuthHeader[6], sizeof(szAuthHeader)-6, szValue);
     g_hWebClient.SetHeader("Authorization", szAuthHeader);
     return SMCParse_Continue;
   } else if (!strcmp(szKey, "SiteAddress")) {
@@ -65,6 +66,7 @@ public SMCResult Configuration_OnKeyValue(SMCParser smc, const char[] szKey, con
       CloseHandle(g_hWebClient);
 
     g_hWebClient = new HTTPClient(szValue);
+    g_hWebClient.SetHeader("User-Agent", "GameX SourceMod Client (v" ... PLUGIN_VERSION ... ")");
   }
 
   g_hValues.SetString(szKey, szValue, true);
