@@ -24,7 +24,7 @@
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.2"
+#define PLUGIN_VERSION  "0.0.0.3"
 
 stock Handle  g_hCorePlugin;
 

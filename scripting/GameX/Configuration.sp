@@ -1,9 +1,12 @@
 static SMCParser g_hSMC;
 
+char g_szAuthHeader[1024];
+
 void Configuration_Load() {
   Configuration_InitParser();
   g_hValues.Clear();
   Configuration_Start();
+  Configuration_InitHTTP();
 }
 
 static void Configuration_InitParser() {
@@ -41,6 +44,21 @@ static void Configuration_HandleCriticalError(SMCError err) {
   SetFailState("[GameX] Configuration loading failed with fatal error. See error logs for more details. Error code: %d", err);
 }
 
+static void Configuration_InitHTTP() {
+  if (g_hWebClient)
+    CloseHandle(g_hWebClient);
+
+  char szURL[256];
+  if (!g_hValues.GetString("SiteAddress", szURL, sizeof(szURL))) {
+    SetFailState("[GameX] Can't initialize HTTP client: site address not exists in config.");
+    return;
+  }
+
+  g_hWebClient = new HTTPClient(szURL);
+  g_hWebClient.SetHeader("Authorization", g_szAuthHeader);
+  g_hWebClient.SetHeader("User-Agent", "GameX SourceMod Client (v" ... PLUGIN_VERSION ... ")");
+}
+
 public SMCResult Configuration_OnEnterSection(SMCParser smc, const char[] szName, bool bOptQuotes) {
   return SMCParse_Continue;
 }
@@ -51,22 +69,11 @@ public SMCResult Configuration_OnLeaveSection(SMCParser smc) {
 
 public SMCResult Configuration_OnKeyValue(SMCParser smc, const char[] szKey, const char[] szValue, bool bKeyQuotes, bool bValueQuotes) {
   if (!strcmp(szKey, "Token")) {
-    if (!g_hWebClient) {
-      LogError("[GameX] Can't set up token: client not initialized.");
-      return SMCParse_HaltFail;
-    }
-
     char szAuthHeader[1024];
     strcopy(szAuthHeader, sizeof(szAuthHeader), "Basic ");
     EncodeBase64(szAuthHeader[6], sizeof(szAuthHeader)-6, szValue);
-    g_hWebClient.SetHeader("Authorization", szAuthHeader);
-    return SMCParse_Continue;
-  } else if (!strcmp(szKey, "SiteAddress")) {
-    if (g_hWebClient)
-      CloseHandle(g_hWebClient);
-
-    g_hWebClient = new HTTPClient(szValue);
-    g_hWebClient.SetHeader("User-Agent", "GameX SourceMod Client (v" ... PLUGIN_VERSION ... ")");
+    strcopy(g_szAuthHeader, sizeof(g_szAuthHeader), szAuthHeader);
+    return SMCParse_Continue; // we don't should allow write token to global configuration
   }
 
   g_hValues.SetString(szKey, szValue, true);
