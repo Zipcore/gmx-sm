@@ -25,6 +25,14 @@
 #pragma semicolon 1
 
 #define PLUGIN_VERSION  "0.0.0.3"
+// #define DEBUG
+
+#if defined DEBUG
+char g_szDebugLog[PLATFORM_MAX_PATH];
+#define DBGLOG(%0)  LogToFile(g_szDebugLog, %0);
+#else
+#define DBGLOG(%0)
+#endif
 
 stock Handle  g_hCorePlugin;
 
@@ -42,6 +50,11 @@ public Plugin myinfo = {
 };
 
 public void OnPluginStart() {
+#if defined DEBUG
+  BuildPath(Path_SM, g_szDebugLog, sizeof(g_szDebugLog), "logs/GameX_Debug.log");
+#endif
+  DBGLOG("OnPluginStart()")
+
   g_hValues = new StringMap();
   BuildPath(Path_SM, g_szConfiguration, sizeof(g_szConfiguration), "configs/GameX/Core.cfg");
 
@@ -57,12 +70,15 @@ public APLRes AskPluginLoad2(Handle hPlugin, bool bLate, char[] szBuffer, int iB
 }
 
 public Action Cmd_ReloadGameX(int iArgC) {
+  DBGLOG("Cmd_ReloadGameX()")
   Configuration_Load();
   PrintToServer("[GameX] Configuration succesfully reloaded!");
   return Plugin_Handled;
 }
 
 public void OnAPICallFinished(HTTPResponse hResponse, DataPack hPack, const char[] szError) {
+  DBGLOG("OnAPICallFinished(): %x %x '%s'", hResponse, hPack, szError)
+
   hPack.Reset();
   Handle hPlugin = hPack.ReadCell();
   GameXCall pFunction = view_as<GameXCall>(hPack.ReadFunction());
@@ -111,5 +127,6 @@ stock bool IsValidPlugin(Handle hPlugin) {
   }
 
   CloseHandle(hIter);
+  DBGLOG("IsValidPlugin(): %x %i", hPlugin, bResult)
   return bResult;
 }

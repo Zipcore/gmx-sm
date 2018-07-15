@@ -15,6 +15,8 @@ NativeCall(GetConfigValue) {
   char szKey[64];
   GetNativeString(1, szKey, sizeof(szKey));
 
+  DBGLOG("GetConfigValue(): %s", szKey)
+
   if (!g_hValues.GetString(szKey, szBuffer, sizeof(szBuffer)))
     return false;
 
@@ -30,6 +32,8 @@ NativeCall(DoRequest) {
   int iPos = strcopy(szEndPoint, sizeof(szEndPoint), "api/");
   GetNativeString(1, szEndPoint[iPos], sizeof(szEndPoint)-iPos);
 
+  DBGLOG("DoRequest(): %s", szEndPoint)
+
   DataPack hPack = new DataPack();
   hPack.WriteCell(hPlugin);
   hPack.WriteFunction(GetNativeFunction(3));
@@ -39,5 +43,5 @@ NativeCall(DoRequest) {
 }
 
 NativeCall(IsReady) {
-  return !g_hWebClient;
+  return !!g_hWebClient;
 }
