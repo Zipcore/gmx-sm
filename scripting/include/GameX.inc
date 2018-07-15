@@ -20,6 +20,11 @@
 #endif
 
 /**
+ * @section Constants
+ */
+#define GAMEX_HOMEPAGE  "https://git.g-nation.ru/GameX"
+
+/**
  * @section Typedefs
  */
 typedef GameXCall = function void(HTTPStatus iStatusCode, JSON hResponse, const char[] szError, any data);

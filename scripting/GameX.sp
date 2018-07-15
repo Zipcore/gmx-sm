@@ -38,7 +38,7 @@ public Plugin myinfo = {
   version     = PLUGIN_VERSION,
   author      = "CrazyHackGUT aka Kruzya",
   name        = "[GameX] Core",
-  url         = "https://git.g-nation.ru/GameX"
+  url         = GAMEX_HOMEPAGE
 };
 
 public void OnPluginStart() {
