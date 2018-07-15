@@ -42,17 +42,16 @@ public Plugin myinfo = {
 
 public void OnAllPluginsLoaded() {
   char szValue[32];
-  if (!GameX_GetConfigValue("RetryFrequency", szValue, sizeof(szValue))
+  if (!GameX_GetConfigValue("RetryFrequency", szValue, sizeof(szValue)))
     g_flRetryFrequency = 45.0; // use default value
   else
     g_flRetryFrequency = StringToFloat(szValue);
 }
 
 public Action OnRequestUserInformation(Handle hTimer, int iClient) {
-  if ((iClient = GetClientOfUserId(iClient)) == 0) 
-    return Plugin_Stop;
-
-  OnClientAuthorized(iClient, NULL_STRING);
+  if ((iClient = GetClientOfUserId(iClient)) != 0) 
+    OnClientAuthorized(iClient, NULL_STRING);
+  return Plugin_Stop;
 }
 
 public void OnClientAuthorized(int iClient, const char[] szAuthID) {
