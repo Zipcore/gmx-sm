@@ -24,7 +24,7 @@
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.3"
+#define PLUGIN_VERSION  "0.0.0.4"
 // #define DEBUG
 
 #if defined DEBUG

@@ -17,11 +17,13 @@ NativeCall(GetConfigValue) {
 
   DBGLOG("GetConfigValue(): %s", szKey)
 
-  if (!g_hValues.GetString(szKey, szBuffer, sizeof(szBuffer)))
-    return false;
+  bool bResult = g_hValues.GetString(szKey, szBuffer, sizeof(szBuffer)); 
+  if (!bResult)
+    if (iParams > 3)
+      GetNativeString(4, szBuffer, sizeof(szBuffer));
 
   SetNativeString(2, szBuffer, GetNativeCell(3), true);
-  return true;
+  return bResult;
 }
 
 NativeCall(DoRequest) {

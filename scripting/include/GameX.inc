@@ -37,6 +37,7 @@ typedef GameXCall = function void(HTTPStatus iStatusCode, JSON hResponse, const 
  * @param   szKey       Parameter name (key).
  * @param   szBuffer    Buffer for writing value.
  * @param   iMaxLength  Buffer size.
+ * @param   szDefault   Value for writing, if setting can't be found.
  * @return  bool        True, if setting exists and written.
  * @note                Before writing setting value to plugin buffer,
  *                      Core creates a temporary variable for storage
@@ -44,7 +45,7 @@ typedef GameXCall = function void(HTTPStatus iStatusCode, JSON hResponse, const 
  *                      You can't retrieve setting value with size
  *                      higher 1024.
  */
-native bool GameX_GetConfigValue(const char[] szKey, char[] szBuffer, int iMaxLength);
+native bool GameX_GetConfigValue(const char[] szKey, char[] szBuffer, int iMaxLength, const char[] szDefault = "");
 
 /**
  * Processes the request to GameX, if possible.
