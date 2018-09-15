@@ -18,13 +18,12 @@
  */
 
 #include <sourcemod>
-#include <base64>
 #include <GameX>
 
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.4"
+#define PLUGIN_VERSION  "0.0.0.5"
 // #define DEBUG
 
 #if defined DEBUG

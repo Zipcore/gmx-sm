@@ -69,10 +69,7 @@ public SMCResult Configuration_OnLeaveSection(SMCParser smc) {
 
 public SMCResult Configuration_OnKeyValue(SMCParser smc, const char[] szKey, const char[] szValue, bool bKeyQuotes, bool bValueQuotes) {
   if (!strcmp(szKey, "Token")) {
-    char szAuthHeader[1024];
-    strcopy(szAuthHeader, sizeof(szAuthHeader), "Basic ");
-    EncodeBase64(szAuthHeader[6], sizeof(szAuthHeader)-6, szValue);
-    strcopy(g_szAuthHeader, sizeof(g_szAuthHeader), szAuthHeader);
+    FormatEx(g_szAuthHeader, sizeof(g_szAuthHeader), "Token %s", szValue);
     return SMCParse_Continue; // we don't should allow write token to global configuration
   }
 
