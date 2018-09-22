@@ -22,7 +22,7 @@
 /**
  * @section Constants
  */
-#define GAMEX_HOMEPAGE  "https://git.g-nation.ru/GameX"
+#define GAMEX_HOMEPAGE  "https://gm-x.info/"
 
 /**
  * @section Typedefs
