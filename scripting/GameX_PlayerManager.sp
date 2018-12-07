@@ -30,7 +30,7 @@ float   g_flRetryFrequency;
 
 public Plugin myinfo = {
   description = "Player Manager for GameX",
-  version     = "0.0.0.3",
+  version     = "0.0.0.4",
   author      = "CrazyHackGUT aka Kruzya",
   name        = "[GameX] Player Manager",
   url         = GAMEX_HOMEPAGE
@@ -70,9 +70,15 @@ public void OnClientAuthorized(int iClient, const char[] szAuthID) {
   char szName[128];
   GetClientName(iClient, szName, sizeof(szName));
 
+  // retrieve IP
+  char szIP[32];
+  GetClientIP(iClient, szIP, sizeof(szIP));
+
   JSONObject hRequest = new JSONObject();
+  hRequest.SetInt("emulator",   0);
   hRequest.SetString("steamid", szSteamID);
   hRequest.SetString("nick",    szName);
+  hRequest.SetString("ip",      szIP);
 
   GameX_DoRequest("player", hRequest, OnGetUserFinished, GetClientUserId(iClient));
   CloseHandle(hRequest);
