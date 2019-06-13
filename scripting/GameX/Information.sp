@@ -8,6 +8,7 @@ void Information_SendStart()
     hRequest.SetString("map", szCurrentMap);
     hRequest.SetInt("max_players", Information_MaxPlayers());
 
+    DBGLOG("Information_SendStart(): Map '%s', MaxPlayers '%d'", szCurrentMap, Information_MaxPlayers())
     GameX_DoRequest("server/info", hRequest, Information_OnStartDelivered);
     CloseHandle(hRequest);
 }
@@ -18,6 +19,7 @@ void Information_SendPing()
     JSONObject hRequest = new JSONObject();
     hRequest.SetInt("num_players", GetClientCount(false));
 
+    DBGLOG("Information_SendPing(): Current players %d", GetClientCount(false))
     GameX_DoRequest("server/ping", hRequest, Information_OnPingDelivered);
     CloseHandle(hRequest);
 }
@@ -54,6 +56,16 @@ public void Information_OnPingDelivered(HTTPStatus iStatusCode, JSON hResponse, 
 {
     DBGLOG("Information_OnPingDelivered(%d, %x, '%s', %d)", iStatusCode, hResponse, szError, data)
     UTIL_Information_IsOk(iStatusCode, szError);
+
+    CreateTimer(60.0, Information_ResendPing);
+}
+
+/**
+ * @section Timer
+ */
+public Action Information_ResendPing(Handle hTimer)
+{
+    Information_SendPing();
 }
 
 /**
