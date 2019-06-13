@@ -23,7 +23,7 @@
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.5"
+#define PLUGIN_VERSION  "0.0.0.6"
 // #define DEBUG
 
 #if defined DEBUG
@@ -48,7 +48,8 @@ public Plugin myinfo = {
   url         = GAMEX_HOMEPAGE
 };
 
-public void OnPluginStart() {
+public void OnPluginStart()
+{
 #if defined DEBUG
   BuildPath(Path_SM, g_szDebugLog, sizeof(g_szDebugLog), "logs/GameX_Debug.log");
 #endif
@@ -57,25 +58,34 @@ public void OnPluginStart() {
   g_hValues = new StringMap();
   BuildPath(Path_SM, g_szConfiguration, sizeof(g_szConfiguration), "configs/GameX/Core.cfg");
 
-  Configuration_Load();
-
   RegServerCmd("sm_reloadgamex", Cmd_ReloadGameX);
 }
 
-public APLRes AskPluginLoad2(Handle hPlugin, bool bLate, char[] szBuffer, int iBufferLength) {
+public void OnMapStart()
+{
+  Configuration_Load();
+  Information_SendStart();
+}
+
+public APLRes AskPluginLoad2(Handle hPlugin, bool bLate, char[] szBuffer, int iBufferLength)
+{
   g_hCorePlugin = hPlugin;
   API_Initialize();
   return APLRes_Success;
 }
 
-public Action Cmd_ReloadGameX(int iArgC) {
+public Action Cmd_ReloadGameX(int iArgC)
+{
   DBGLOG("Cmd_ReloadGameX()")
   Configuration_Load();
   PrintToServer("[GameX] Configuration succesfully reloaded!");
+
+  Information_SendStart();
   return Plugin_Handled;
 }
 
-public void OnAPICallFinished(HTTPResponse hResponse, DataPack hPack, const char[] szError) {
+public void OnAPICallFinished(HTTPResponse hResponse, DataPack hPack, const char[] szError)
+{
   DBGLOG("OnAPICallFinished(): %x %x '%s'", hResponse, hPack, szError)
 
   hPack.Reset();
@@ -112,9 +122,11 @@ public void OnAPICallFinished(HTTPResponse hResponse, DataPack hPack, const char
 }
 
 #include "GameX/Configuration.sp"
+#include "GameX/Information.sp"
 #include "GameX/API.sp"
 
-stock bool IsValidPlugin(Handle hPlugin) {
+stock bool IsValidPlugin(Handle hPlugin)
+{
   Handle hIter = GetPluginIterator();
   bool bResult;
 

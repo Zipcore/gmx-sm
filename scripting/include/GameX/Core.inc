@@ -1,7 +1,33 @@
+#if defined _GameX_Core_included
+  #endinput
+#endif
+#define _GameX_Core_included
+
+// With any changes in GameX API, this value will be increased.
+#define GAMEXCORE_APIVERSION  0000016
+
 /**
  * @section Typedefs
  */
-typedef GameXCall = function void(HTTPStatus iStatusCode, JSON hResponse, const char[] szError, any data);
+typeset GameXCall
+{
+  // Called when request finished.
+  //
+  // @param iStatusCode             HTTP Status Code.
+  // @param hResponse               JSON Response body.
+  //                                Use RiP natives for working with this.
+  // @param szError                 Error message (from cURL, if happened).
+  // @param data                    Any passed user data.
+  function void(HTTPStatus iStatusCode, JSON hResponse, const char[] szError, any data);
+
+  // Called when request finished.
+  //
+  // @param iStatusCode             HTTP Status Code.
+  // @param hResponse               JSON Response body.
+  //                                Use RiP natives for working with this.
+  // @param szError                 Error message (from cURL, if happened).
+  function void(HTTPStatus iStatusCode, JSON hResponse, const char[] szError);
+}
 
 /**
  * @section Natives

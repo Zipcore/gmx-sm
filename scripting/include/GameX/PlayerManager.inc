@@ -1,3 +1,11 @@
+#if defined _GameX_PlayerManager_included
+  #endinput
+#endif
+#define _GameX_PlayerManager_included
+
+// With any changes in GameX API, this value will be increased.
+#define GAMEXPLAYERMANAGER_APIVERSION  0000014
+
 /**
  * @section Forwards
  */
