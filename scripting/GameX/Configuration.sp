@@ -55,7 +55,7 @@ static void Configuration_InitHTTP() {
   }
 
   g_hWebClient = new HTTPClient(szURL);
-  g_hWebClient.SetHeader("Authorization", g_szAuthHeader);
+  g_hWebClient.SetHeader("X-Token", g_szAuthHeader);
   g_hWebClient.SetHeader("User-Agent", "GameX SourceMod Client (v" ... PLUGIN_VERSION ... ")");
 }
 
@@ -69,7 +69,7 @@ public SMCResult Configuration_OnLeaveSection(SMCParser smc) {
 
 public SMCResult Configuration_OnKeyValue(SMCParser smc, const char[] szKey, const char[] szValue, bool bKeyQuotes, bool bValueQuotes) {
   if (!strcmp(szKey, "Token")) {
-    FormatEx(g_szAuthHeader, sizeof(g_szAuthHeader), "Token %s", szValue);
+    strcopy(g_szAuthHeader, sizeof(g_szAuthHeader), szValue);
     return SMCParse_Continue; // we don't should allow write token to global configuration
   }
 
