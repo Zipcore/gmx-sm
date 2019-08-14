@@ -1,0 +1,45 @@
+language: c
+dist: precise
+
+env:
+    - SMVERSION=1.8
+    - SMVERSION=1.9
+    - SMVERSION=1.10
+
+matrix:
+    fast_finish: true
+    allow_failures:
+    - env: SMVERSION=1.8
+
+before_install:
+    - sudo apt-get update
+    - sudo apt-get install gcc-multilib
+    - sudo apt-get install lib32stdc++6
+
+before_script:
+    # Make directory for SourceMod
+    - mkdir -p am/sm
+    - cd am/sm
+    - wget -q "http://www.sourcemod.net/latest.php?version=$SMVERSION&os=linux" -O sourcemod.tar.gz
+    - tar -xzf sourcemod.tar.gz
+
+    # Download git-helper script for generating defines, start him.
+    - wget -q https://raw.githubusercontent.com/CrazyHackGUT/sm-plugins/master/git.sh
+    - chmod +x git.sh
+    - ./git.sh > addons/sourcemod/scripting/GameX.git.sp
+
+    # Go to scripting directory, exec chmod
+    - cd addons/sourcemod/scripting
+    - chmod +x spcomp
+    - chmod +x compile.sh
+
+    # Copy plugins, download dependencies
+    - cp -Rf ${TRAVIS_BUILD_DIR}/scripting/* ./
+    - mkdir -p include/ripext
+    - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext.inc" -o include/ripext.inc
+    - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext/http.inc" -o include/ripext/http.inc
+    - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext/json.inc" -o include/ripext/json.inc
+
+script:
+    - ./spcomp GameX.git.sp GameX.sp -E -oGameX
+    - ./spcomp GameX.git.sp GameX_PlayerManager.sp -E -oGameX_PlayerManager
