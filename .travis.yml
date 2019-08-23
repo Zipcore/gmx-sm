@@ -2,9 +2,12 @@ language: c
 dist: bionic
 
 env:
-    - SMVERSION=1.8
-    - SMVERSION=1.9
-    - SMVERSION=1.10
+    - SMVERSION=1.8  COMPILER_PARAMS=""
+    - SMVERSION=1.8  COMPILER_PARAMS="_GMX_DEBUG=1"
+    - SMVERSION=1.9  COMPILER_PARAMS=""
+    - SMVERSION=1.9  COMPILER_PARAMS="_GMX_DEBUG=1"
+    - SMVERSION=1.10 COMPILER_PARAMS=""
+    - SMVERSION=1.10 COMPILER_PARAMS="_GMX_DEBUG=1"
 
 matrix:
     fast_finish: true
@@ -41,11 +44,12 @@ before_script:
     - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext/json.inc" -o include/ripext/json.inc
 
 script:
-    - ./spcomp GameX.git.sp GameX.sp -E -oGameX
-    - ./spcomp GameX.git.sp GameX_PlayerManager.sp -E -oGameX_PlayerManager
+    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX.sp -E -oGameX
+    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX_PlayerManager.sp -E -oGameX_PlayerManager
 
 before_deploy:
     - export CUSTOM_POSTFIX=_$SMVERSION
+    - if [ "$COMPILER_PARAMS" ]; then export CUSTOM_POSTFIX=$CUSTOM_POSTFIX"_debug"; fi
     - mkdir -p $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/{configs/GameX,scripting,plugins}
     - cp -Rf $TRAVIS_BUILD_DIR/scripting/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/scripting/
     - cp -Rf $TRAVIS_BUILD_DIR/configs/GameX/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/configs/GameX/
