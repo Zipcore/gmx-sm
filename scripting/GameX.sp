@@ -23,7 +23,7 @@
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.7"
+#define PLUGIN_VERSION  "0.0.0.8"
 // #define DEBUG
 
 #if defined DEBUG
@@ -58,7 +58,8 @@ public void OnPluginStart()
   g_hValues = new StringMap();
   BuildPath(Path_SM, g_szConfiguration, sizeof(g_szConfiguration), "configs/GameX/Core.cfg");
 
-  RegServerCmd("sm_reloadgamex", Cmd_ReloadGameX);
+  RegServerCmd("gmx_reloadconfig", Cmd_ReloadGameX);
+  RegServerCmd("gmx_reloadadmins", Cmd_ReloadAdmins);
 }
 
 public void OnMapStart()
@@ -81,6 +82,20 @@ public Action Cmd_ReloadGameX(int iArgC)
   PrintToServer("[GameX] Configuration succesfully reloaded!");
 
   Information_SendStart();
+  return Plugin_Handled;
+}
+
+public Action Cmd_ReloadAdmins(int iArgC)
+{
+  DBGLOG("Cmd_ReloadAdmins()")
+
+  if (!GameX_GetBoolConfigValue("DumpAdminCacheCommand"))
+    return Plugin_Continue;
+
+  /* Dump it all! */
+  DBGLOG("Cmd_ReloadAdmins(): dumping caches...")
+  DumpAdminCache(AdminCache_Groups, true);
+  DumpAdminCache(AdminCache_Overrides, true);
   return Plugin_Handled;
 }
 

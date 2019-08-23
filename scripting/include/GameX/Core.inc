@@ -69,6 +69,57 @@ native void GameX_DoRequest(const char[] szCallName, JSONObject hRequest, GameXC
 native bool GameX_IsReady();
 
 /**
+ * Retrieves config value in boolean representation.
+ *
+ * @param   szKey       Parameter name (key).
+ * @param   bDefault    Default value.
+ *
+ * @return              Parameter value.
+ */
+stock bool GameX_GetBoolConfigValue(const char[] szKey, bool bDefault = false)
+{
+  char szValue[4];
+  if (!GameX_GetConfigValue(szKey, szValue, sizeof(szValue)))
+    return bDefault;
+
+  return (szValue[0] != '0');
+}
+
+/**
+ * Retrieves config value in integer representation.
+ *
+ * @param   szKey       Parameter name (key).
+ * @param   iDefault    Default value.
+ *
+ * @return              Parameter value.
+ */
+stock int GameX_GetIntegerConfigValue(const char[] szKey, int iDefault = 0)
+{
+  char szValue[16];
+  if (!GameX_GetConfigValue(szKey, szValue, sizeof(szValue)))
+    return iDefault;
+
+  return StringToInt(szValue);
+}
+
+/**
+ * Retrieves config value in float representation.
+ *
+ * @param   szKey       Parameter name (key).
+ * @param   iDefault    Default value.
+ *
+ * @return              Parameter value.
+ */
+stock float GameX_GetFloatConfigValue(const char[] szKey, float flDefault = 0.0)
+{
+  char szValue[32];
+  if (!GameX_GetConfigValue(szKey, szValue, sizeof(szValue)))
+    return flDefault;
+
+  return StringToFloat(szValue);
+}
+
+/**
  * @section Shared Plugin
  */
 public SharedPlugin __pl_GameX = {

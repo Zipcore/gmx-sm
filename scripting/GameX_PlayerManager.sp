@@ -30,7 +30,7 @@ float   g_flRetryFrequency;
 
 public Plugin myinfo = {
   description = "Player Manager for GameX",
-  version     = "0.0.0.4",
+  version     = "0.0.0.5",
   author      = "CrazyHackGUT aka Kruzya",
   name        = "[GameX] Player Manager",
   url         = GAMEX_HOMEPAGE
@@ -42,10 +42,7 @@ public APLRes AskPluginLoad2(Handle hMySelf, bool bLate, char[] szError, int iBu
 }
 
 public void OnAllPluginsLoaded() {
-  char szValue[32];
-  GameX_GetConfigValue("RetryFrequency", szValue, sizeof(szValue), "45.0");
-
-  g_flRetryFrequency = StringToFloat(szValue);
+  g_flRetryFrequency = GameX_GetFloatConfigValue("RetryFrequency", 45.0);
 }
 
 public Action OnRequestUserInformation(Handle hTimer, int iClient) {

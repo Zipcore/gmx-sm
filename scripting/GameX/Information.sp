@@ -77,9 +77,7 @@ static int Information_MaxPlayers()
     int iSlots = MaxClients;
 
     // Setting for respecting max visible players.
-    char szValue[4];
-    GameX_GetConfigValue("RespectMaxVisiblePlayers", szValue, sizeof(szValue), "0");
-    if (szValue[0] != '0')
+    if (GameX_GetBoolConfigValue("RespectMaxVisiblePlayers"))
     {
         DBGLOG("Information_MaxPlayers(): We respect Max visible players. Going to subfunction...")
         int iMaxVisiblePlayers = Information_MaxVisiblePlayers();
