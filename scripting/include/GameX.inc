@@ -26,6 +26,7 @@
 #define GAMEX_HOMEPAGE  "https://gm-x.info/"
 
 // Load core.
+#include <GameX/Debug>
 #include <GameX/Core>
 
 // If required, load Player Manager.

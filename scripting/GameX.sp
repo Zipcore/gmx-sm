@@ -17,21 +17,15 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
+// #define GMX_DEBUG
+
 #include <sourcemod>
 #include <GameX>
 
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.8"
-// #define DEBUG
-
-#if defined DEBUG
-char g_szDebugLog[PLATFORM_MAX_PATH];
-#define DBGLOG(%0)  LogToFile(g_szDebugLog, %0);
-#else
-#define DBGLOG(%0)
-#endif
+#define PLUGIN_VERSION  "0.0.0.9"
 
 stock Handle  g_hCorePlugin;
 
@@ -50,9 +44,7 @@ public Plugin myinfo = {
 
 public void OnPluginStart()
 {
-#if defined DEBUG
-  BuildPath(Path_SM, g_szDebugLog, sizeof(g_szDebugLog), "logs/GameX_Debug.log");
-#endif
+  _GMX_STDDBGINIT()
   DBGLOG("OnPluginStart()")
 
   g_hValues = new StringMap();

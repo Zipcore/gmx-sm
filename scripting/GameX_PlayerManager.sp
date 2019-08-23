@@ -30,7 +30,7 @@ float   g_flRetryFrequency;
 
 public Plugin myinfo = {
   description = "Player Manager for GameX",
-  version     = "0.0.0.5",
+  version     = "0.0.0.6",
   author      = "CrazyHackGUT aka Kruzya",
   name        = "[GameX] Player Manager",
   url         = GAMEX_HOMEPAGE
@@ -42,16 +42,22 @@ public APLRes AskPluginLoad2(Handle hMySelf, bool bLate, char[] szError, int iBu
 }
 
 public void OnAllPluginsLoaded() {
+  _GMX_STDDBGINIT()
+
   g_flRetryFrequency = GameX_GetFloatConfigValue("RetryFrequency", 45.0);
+  _GMX_DBGLOG("OnAllPluginsLoaded(): RetryFrequency - %f", g_flRetryFrequency)
 }
 
 public Action OnRequestUserInformation(Handle hTimer, int iClient) {
+  _GMX_DBGLOG("OnRequestUserInformation(): %d", iClient)
+
   if ((iClient = GetClientOfUserId(iClient)) != 0) 
     OnClientAuthorized(iClient, NULL_STRING);
   return Plugin_Stop;
 }
 
 public void OnClientAuthorized(int iClient, const char[] szAuthID) {
+  _GMX_DBGLOG("OnClientAuthorized(): %L (%d, %d)", iClient, IsFakeClient(iClient), GameX_IsReady())
   if (IsFakeClient(iClient))
     return;
 
@@ -82,11 +88,13 @@ public void OnClientAuthorized(int iClient, const char[] szAuthID) {
 }
 
 public void OnGetUserFinished(HTTPStatus iStatusCode, JSON hResponse, const char[] szError, int iClient) {
+  _GMX_DBGLOG("OnGetUserFinished(): %d (%L); '%s', %d, %x", iClient, GetClientOfUserId(iClient), szError, iStatusCode, hResponse)
+
   if ((iClient = GetClientOfUserId(iClient)) == 0)
     return; // client disconnected.
 
   if (szError[0]) {
-    LogError("[GameX Punishments] Can't retrieve data about player %L: %s", iClient, szError);
+    LogError("[GameX Player Manager] Can't retrieve data about player %L: %s", iClient, szError);
     CreateTimer(g_flRetryFrequency, OnRequestUserInformation, GetClientUserId(iClient));
     return;
   }
@@ -95,6 +103,8 @@ public void OnGetUserFinished(HTTPStatus iStatusCode, JSON hResponse, const char
 }
 
 void _OnPlayerLoaded(int iClient, JSON hResponse) {
+  _GMX_DBGLOG("_OnPlayerLoaded(%d, %x)", iClient, hResponse)
+
   Call_StartForward(g_hForward);
   Call_PushCell(iClient);
   Call_PushCell(hResponse);
