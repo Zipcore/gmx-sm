@@ -1,5 +1,5 @@
 language: c
-dist: precise
+dist: bionic
 
 env:
     - SMVERSION=1.8
@@ -43,3 +43,17 @@ before_script:
 script:
     - ./spcomp GameX.git.sp GameX.sp -E -oGameX
     - ./spcomp GameX.git.sp GameX_PlayerManager.sp -E -oGameX_PlayerManager
+
+before_deploy:
+    - export CUSTOM_POSTFIX=_$SMVERSION
+    - mkdir -p $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/{configs/GameX,scripting,plugins}
+    - cp -Rf $TRAVIS_BUILD_DIR/scripting/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/scripting/
+    - cp -Rf $TRAVIS_BUILD_DIR/configs/GameX/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/configs/GameX/
+    - cp -Rf GameX*.smx $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/plugins/
+    - cd $TRAVIS_BUILD_DIR
+    - wget --user=$HTTP_USER --password=$HTTP_PASSWORD $BASE_URL/travis.sh
+
+deploy:
+    - provider: script
+      skip_cleanup: true
+      script: bash travis.sh
