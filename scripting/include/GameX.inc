@@ -12,6 +12,7 @@
 #endif
 
 #include <ripext>
+#include <GMX_Polyfill>
 
 /* Restore old REQUIRE_EXTENSIONS value if necessary */
 #if defined TEMP_REQUIRE_EXTENSIONS
