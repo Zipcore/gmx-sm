@@ -7,3 +7,7 @@
 
 # ---> SourceMod
 *.smx
+
+# ---> GameX cache
+data/gmx/cache/*
+!data/gmx/cache/.gitkeep
