@@ -4,7 +4,7 @@
 #define _GameX_Core_included
 
 // With any changes in GameX API, this value will be increased.
-#define GAMEXCORE_APIVERSION  0000016
+#define GAMEXCORE_APIVERSION  0000017
 
 /**
  * @section Typedefs
@@ -28,6 +28,15 @@ typeset GameXCall
   // @param szError                 Error message (from cURL, if happened).
   function void(HTTPStatus iStatusCode, JSON hResponse, const char[] szError);
 }
+
+/**
+ * @section Forwards
+ */
+/**
+ * Called when GameX perform a reloading by console command.
+ * This can be useful, if you cache any configuration settings.
+ */
+forward void GameX_OnReload();
 
 /**
  * @section Natives
@@ -138,5 +147,8 @@ public void __pl_GameX_SetNTVOptional() {
   MarkNativeAsOptional("GameX_GetConfigValue");
   MarkNativeAsOptional("GameX_DoRequest");
   MarkNativeAsOptional("GameX_IsReady");
+
+  // v0.0.1.0
+  // forward void GameX_OnReload()
 }
 #endif

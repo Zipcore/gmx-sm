@@ -33,3 +33,12 @@
 #if defined _GAMEX_PLAYERMANAGER
   #include <GameX/PlayerManager>
 #endif
+
+// If required, add macro-functions for creating API.
+// Used only by core plugins.
+#if defined _GAMEX_MACRO_API
+  #define GMX_AddNative(%0)       CreateNative("GameX_" ... #%0, API_Native_%0)
+  #define GMX_NativeCall(%0)      public int API_Native_%0(Handle hPlugin, int iParams)
+  #define GMX_RedirectCall(%0)    API_Native_%0(hPlugin, iParams)
+  #define GMX_InterruptCall(%0)   ThrowNativeError(SP_ERROR_NATIVE, %0)
+#endif

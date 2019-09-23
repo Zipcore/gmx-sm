@@ -1,16 +1,24 @@
-#define AddNative(%0)       CreateNative("GameX_" ... #%0, API_Native_%0)
-#define NativeCall(%0)      public int API_Native_%0(Handle hPlugin, int iParams)
-#define RedirectCall(%0)    API_Native_%0(hPlugin, iParams)
-#define InterruptCall(%0)   ThrowNativeError(SP_ERROR_NATIVE, %0)
+Handle g_hFwdReload;
 
 void API_Initialize() {
-  AddNative(GetConfigValue);
-  AddNative(DoRequest);
-  AddNative(IsReady);
+  GMX_AddNative(GetConfigValue);
+  GMX_AddNative(DoRequest);
+  GMX_AddNative(IsReady);
+
+  g_hFwdReload = CreateGlobalForward("GameX_OnReload", ET_Ignore);
+
   RegPluginLibrary("GameX");
 }
 
-NativeCall(GetConfigValue) {
+void API_OnReload()
+{
+  _GMX_DBGLOG("API_OnReload")
+
+  Call_StartForward(g_hFwdReload);
+  Call_Finish();
+}
+
+GMX_NativeCall(GetConfigValue) {
   char szBuffer[1024];
   char szKey[64];
   GetNativeString(1, szKey, sizeof(szKey));
@@ -26,9 +34,9 @@ NativeCall(GetConfigValue) {
   return bResult;
 }
 
-NativeCall(DoRequest) {
-  if (!RedirectCall(IsReady))
-    InterruptCall("Web Client is not ready!");
+GMX_NativeCall(DoRequest) {
+  if (!GMX_RedirectCall(IsReady))
+    GMX_InterruptCall("Web Client is not ready!");
 
   char szEndPoint[64];
   int iPos = strcopy(szEndPoint, sizeof(szEndPoint), "api/");
@@ -44,6 +52,6 @@ NativeCall(DoRequest) {
   g_hWebClient.Post(szEndPoint, GetNativeCell(2), OnAPICallFinished, hPack);
 }
 
-NativeCall(IsReady) {
+GMX_NativeCall(IsReady) {
   return !!g_hWebClient;
 }

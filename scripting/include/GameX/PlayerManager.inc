@@ -4,7 +4,7 @@
 #define _GameX_PlayerManager_included
 
 // With any changes in GameX API, this value will be increased.
-#define GAMEXPLAYERMANAGER_APIVERSION  0000014
+#define GAMEXPLAYERMANAGER_APIVERSION  0000015
 
 /**
  * @section Forwards
@@ -16,6 +16,18 @@
  * @param hBody         JSON body with data.
  */
 forward void GameX_OnPlayerLoaded(int iClient, JSONObject hBody);
+
+/**
+ * @section Natives
+ */
+/**
+ * Retrieves the client session id.
+ *
+ * @param iClient       Unique client identifier.
+ * @return              The current session id. -1 if not authorized.
+ * @error               Player is not in game.
+ */
+native int GameX_GetClientSessionId(int iClient);
 
 /**
  * @section Shared Plugin

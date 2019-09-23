@@ -9,6 +9,8 @@ void Configuration_Load() {
   g_hValues.Clear();
   Configuration_Start();
   Configuration_InitHTTP();
+
+  API_OnReload();
 }
 
 static void Configuration_InitParser() {

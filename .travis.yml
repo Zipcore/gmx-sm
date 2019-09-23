@@ -42,20 +42,23 @@ before_script:
     - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext.inc" -o include/ripext.inc
     - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext/http.inc" -o include/ripext/http.inc
     - curl "https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include/ripext/json.inc" -o include/ripext/json.inc
+    - mkdir -p GameX
 
 script:
-    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX.sp -E -oGameX
-    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX_PlayerManager.sp -E -oGameX_PlayerManager
+    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX.sp -E -oGameX/Core
+    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX_PlayerManager.sp -E -oGameX/PlayerManager
+    - ./spcomp $COMPILER_PARAMS GameX.git.sp GameX_ServerInformation.sp -E -oGameX/ServerInformation
 
 before_deploy:
     - export CUSTOM_POSTFIX=_$SMVERSION
     - if [ "$COMPILER_PARAMS" ]; then export CUSTOM_POSTFIX=$CUSTOM_POSTFIX"_debug"; fi
-    - mkdir -p $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/{configs/GameX,scripting,plugins}
+    - mkdir -p $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/{configs/GameX,scripting,plugins/GameX,data/gmx/cache}
     - cp -Rf $TRAVIS_BUILD_DIR/scripting/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/scripting/
     - cp -Rf $TRAVIS_BUILD_DIR/configs/GameX/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/configs/GameX/
-    - cp -Rf GameX*.smx $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/plugins/
+    - cp -Rf GameX/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/plugins/GameX
     - cd $TRAVIS_BUILD_DIR
     - wget --user=$HTTP_USER --password=$HTTP_PASSWORD $BASE_URL/travis.sh
+    - touch $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/data/gmx/cache/.keep
 
 deploy:
     - provider: script

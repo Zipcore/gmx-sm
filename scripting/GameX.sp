@@ -20,12 +20,14 @@
 // #define GMX_DEBUG
 
 #include <sourcemod>
+
+#define _GAMEX_MACRO_API
 #include <GameX>
 
 #pragma newdecls  required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION  "0.0.0.9"
+#define PLUGIN_VERSION  "0.0.1.0"
 
 stock Handle  g_hCorePlugin;
 
@@ -57,7 +59,6 @@ public void OnPluginStart()
 public void OnMapStart()
 {
   Configuration_Load();
-  Information_SendStart();
 }
 
 public APLRes AskPluginLoad2(Handle hPlugin, bool bLate, char[] szBuffer, int iBufferLength)
@@ -73,7 +74,6 @@ public Action Cmd_ReloadGameX(int iArgC)
   Configuration_Load();
   PrintToServer("[GameX] Configuration succesfully reloaded!");
 
-  Information_SendStart();
   return Plugin_Handled;
 }
 
@@ -129,7 +129,6 @@ public void OnAPICallFinished(HTTPResponse hResponse, DataPack hPack, const char
 }
 
 #include "GameX/Configuration.sp"
-#include "GameX/Information.sp"
 #include "GameX/API.sp"
 
 stock bool IsValidPlugin(Handle hPlugin)
