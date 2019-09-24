@@ -1,0 +1,59 @@
+name: CI GameX Plugin
+
+on:
+  push:
+    paths:
+      - '*'
+      - '!/docs/*'
+      - '!/.github/*'
+      - '.github/workflows/*'
+      - '!/.travis.yml'
+      - '!README.md'
+      - '!LICENSE'
+
+jobs:
+  build:
+    name: Build plugins
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        sourcemod: ["1.8", "1.9", "1.10"]
+        parameters: ["", "_GMX_DEBUG=1"]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v1
+
+    - name: Download SourceMod archive
+      env:
+        SMVERSION: ${{ matrix.sourcemod }}
+      run: |
+        mkdir -p am/sm
+        wget -q "http://www.sourcemod.net/latest.php?version=$SMVERSION&os=linux" -O am/sm/sourcemod.tar.gz
+        cd am/sm
+        tar -xzf sourcemod.tar.gz
+        cd ../..
+
+    - name: Download third-party dependencies
+      env:
+        RIPBASEURL: 'https://raw.githubusercontent.com/ErikMinekus/sm-ripext/master/pawn/scripting/include'
+        RIPBASEPATH: '3rd_party/rip'
+      run: |
+        mkdir -p $RIPBASEPATH/ripext
+        curl -s -o $RIPBASEPATH/ripext.inc "$RIPBASEURL/ripext.inc"
+        curl -s -o $RIPBASEPATH/ripext/http.inc "$RIPBASEURL/ripext/http.inc"
+        curl -s -o $RIPBASEPATH/ripext/json.inc "$RIPBASEURL/ripext/json.inc"
+
+    - name: Compile plugin
+      env:
+        SMPATH: am/sm/addons/sourcemod/scripting
+        SOURCES: scripting
+        DEPPATH: 3rd_party
+        TARGET: plugins/GameX
+        SPCOMP_ARGS: ${{ matrix.parameters }}
+      run: |
+        mkdir -p plugins/GameX/optional
+        ./$SMPATH/spcomp $SPCOMP_ARGS -i$SMPATH/include -i$DEPPATH/rip -i$SOURCES/include -o$TARGET/Core $SOURCES/GameX.sp
+        ./$SMPATH/spcomp $SPCOMP_ARGS -i$SMPATH/include -i$DEPPATH/rip -i$SOURCES/include -o$TARGET/PlayerManager $SOURCES/GameX_PlayerManager.sp
+        ./$SMPATH/spcomp $SPCOMP_ARGS -i$SMPATH/include -i$DEPPATH/rip -i$SOURCES/include -o$TARGET/ServerInformation $SOURCES/GameX_ServerInformation.sp
