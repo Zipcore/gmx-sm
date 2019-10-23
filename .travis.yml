@@ -8,11 +8,16 @@ env:
     - SMVERSION=1.9  COMPILER_PARAMS="_GMX_DEBUG=1"
     - SMVERSION=1.10 COMPILER_PARAMS=""
     - SMVERSION=1.10 COMPILER_PARAMS="_GMX_DEBUG=1"
+    - SMVERSION=1.11 COMPILER_PARAMS=""
+    - SMVERSION=1.11 COMPILER_PARAMS="_GMX_DEBUG=1"
 
 matrix:
     fast_finish: true
     allow_failures:
-    - env: SMVERSION=1.8
+    - env: SMVERSION=1.8  COMPILER_PARAMS=""
+    - env: SMVERSION=1.8  COMPILER_PARAMS="_GMX_DEBUG=1"
+    - env: SMVERSION=1.9  COMPILER_PARAMS=""
+    - env: SMVERSION=1.9  COMPILER_PARAMS="_GMX_DEBUG=1"
 
 before_install:
     - sudo apt-get update
