@@ -16,6 +16,13 @@
 
     "GameX.PM.AssignResult_N"
     {
+        "en"    "Your account cannot be assigned at this moment."
+        "ru"    "Ваш аккаунт не может быть привязан сейчас."
+    }
 
+    "GameX.PM.AssignResult_Y"
+    {
+        "en"    "Thank you! Your account successfully assigned."
+        "ru"    "Спасибо! Ваш аккаунт успешно привязан."
     }
 }
