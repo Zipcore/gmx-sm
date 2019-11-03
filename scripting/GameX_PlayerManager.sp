@@ -48,7 +48,7 @@ bool      g_bLate;
 
 public Plugin myinfo = {
   description = "Player Manager for GameX",
-  version     = "0.0.0.8",
+  version     = "0.0.1.0",
   author      = "CrazyHackGUT aka Kruzya",
   name        = "[GameX] Player Manager",
   url         = GAMEX_HOMEPAGE
