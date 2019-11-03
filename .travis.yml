@@ -57,7 +57,7 @@ script:
 before_deploy:
     - export CUSTOM_POSTFIX=_$SMVERSION
     - if [ "$COMPILER_PARAMS" ]; then export CUSTOM_POSTFIX=$CUSTOM_POSTFIX"_debug"; fi
-    - mkdir -p $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/{configs/GameX,scripting,plugins/GameX,data/gmx/cache}
+    - mkdir -p $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/{configs/GameX,scripting,plugins/GameX,data/gmx/cache,translations}
     - cp -Rf $TRAVIS_BUILD_DIR/scripting/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/scripting/
     - cp -Rf $TRAVIS_BUILD_DIR/translations/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/translations/
     - cp -Rf $TRAVIS_BUILD_DIR/configs/GameX/* $TRAVIS_BUILD_DIR/../$SFTP_SOURCE_DIRECTORY/addons/sourcemod/configs/GameX/
