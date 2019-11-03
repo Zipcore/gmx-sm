@@ -1,0 +1,33 @@
+/**
+ * This file is a part of "GameX" SourceMod plugin.
+ * Licensed by GNU GPL v3.
+ *
+ * All rights reserved.
+ * (c) GameX Dev Team 2018-2019
+ */
+
+"Phrases"
+{
+    "GameX.Common.ChatPrefix"
+    {
+        "en"    "[GameX] "
+    }
+
+    "GameX.Common.InGame"
+    {
+        "en"    "Use this command in-game only!"
+        "ru"    "Используйте эту команду только в игре!"
+    }
+
+    "GameX.Common.DataIsNotReady"
+    {
+        "en"    "Your data is not ready."
+        "ru"    "Ваши данные ещё не готовы."
+    }
+
+    "GameX.Common.PleaseTryAgain"
+    {
+        "en"    "Please, try again later."
+        "ru"    "Пожалуйста, повторите попытку позже."
+    }
+}

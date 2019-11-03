@@ -36,6 +36,10 @@ float   g_flRetryFrequency;
  *
  * So, array size always multiple 3.
  */
+#define _GAMEX_USERID     0 // u
+#define _GAMEX_SESSIONID  1 // s
+#define _GAMEX_PLAYERID   2 // p
+
 ArrayList g_hSessions;
 bool      g_bLate;
 
@@ -68,6 +72,10 @@ public void OnPluginStart()
     for (int iClient = MaxClients; iClient != 0; --iClient)
       if (IsClientInGame(iClient) && IsClientAuthorized(iClient))
         UTIL_ConnectClient(iClient);
+
+  RegConsoleCmd("gmx_assign", Cmd_Assign, "Assigns the player account to user on site");
+  LoadTranslations("gamex_common.phrases");
+  LoadTranslations("gamex_pm.phrases");
 }
 
 public void GameX_OnReload()
@@ -155,10 +163,6 @@ void UTIL_ConnectClient(int iClient)
   }
 
   GameX_DoRequest("player/connect", hRequest, OnGetUserFinished, GetClientUserId(iClient));
-
-  char szUserRequest[512];
-  hRequest.ToString(szUserRequest, sizeof(szUserRequest));
-  _GMX_DBGLOG("%s", szUserRequest)
 
   CloseHandle(hRequest);
 }
@@ -272,7 +276,7 @@ stock int UTIL_GetSessionIdByClient(int iClient)
 stock int UTIL_GetSessionIdByUserId(int iUserId)
 {
   _GMX_DBGLOG("UTIL_GetSessionIdByUserId(): %d", iUserId)
-  return UTIL_GetArrayValueByValDiff(g_hSessions, iUserId, -1, 1);
+  return UTIL_GetArrayValueByValDiff(g_hSessions, iUserId, _GAMEX_USERID, -1, 1);
 }
 
 stock int UTIL_GetGMXIdByClient(int iClient)
@@ -284,25 +288,25 @@ stock int UTIL_GetGMXIdByClient(int iClient)
 stock int UTIL_GetGMXIdByUserId(int iUserId)
 {
   _GMX_DBGLOG("UTIL_GetGMXIdByUserId(): %d", iUserId)
-  return UTIL_GetArrayValueByValDiff(g_hSessions, iUserId, -1, 2);
+  return UTIL_GetArrayValueByValDiff(g_hSessions, iUserId, _GAMEX_USERID, -1, 2);
 }
 
 stock int UTIL_GetGMXIdBySessionId(int iSession)
 {
   _GMX_DBGLOG("UTIL_GetGMXIdBySessionId(): %d", iSession)
-  return UTIL_GetArrayValueByValDiff(g_hSessions, iSession, -1, 1);
+  return UTIL_GetArrayValueByValDiff(g_hSessions, iSession, _GAMEX_SESSIONID, -1, 1);
 }
 
 stock int UTIL_GetUserIdByGMXId(int iGameXId)
 {
   _GMX_DBGLOG("UTIL_GetUserIdByGMXId(): %d", iGameXId)
-  return UTIL_GetArrayValueByValDiff(g_hSessions, iGameXId, 0, -2);
+  return UTIL_GetArrayValueByValDiff(g_hSessions, iGameXId, _GAMEX_PLAYERID, 0, -2);
 }
 
 stock int UTIL_GetUserIdBySessionId(int iSession)
 {
   _GMX_DBGLOG("UTIL_GetUserIdBySessionId(): %d", iSession)
-  return UTIL_GetArrayValueByValDiff(g_hSessions, iSession, 0, -1);
+  return UTIL_GetArrayValueByValDiff(g_hSessions, iSession, _GAMEX_SESSIONID, 0, -1);
 }
 
 stock void UTIL_WriteSessionForClient(int iClient, int iSessionId, int iPlayerId)
@@ -322,19 +326,131 @@ stock void UTIL_WriteSession(int iUserId, int iSessionId, int iPlayerId)
   }
 
   // Now write.
-  g_hSessions.Push(iUserId);
-  g_hSessions.Push(iSessionId);
-  g_hSessions.Push(iPlayerId);
+  char szData[16];
+
+  FormatEx(szData, sizeof(szData), "u%d", iUserId);
+  g_hSessions.PushString(szData);
+
+  FormatEx(szData, sizeof(szData), "s%d", iSessionId);
+  g_hSessions.PushString(szData);
+
+  FormatEx(szData, sizeof(szData), "p%d", iPlayerId);
+  g_hSessions.PushString(szData);
 }
 
-stock int UTIL_GetArrayValueByValDiff(ArrayList hList, any iSearchableValue, any iDefaultValue = 0, int iOffset = 0)
+stock void UTIL_SetPlayerIdBySessionId(int iSessionId, int iPlayerId)
 {
-  _GMX_DBGLOG("UTIL_GetArrayValueByValDiff(): %x -> %d %d", hList, iSearchableValue, iOffset)
-  int iPos = hList.FindValue(iSearchableValue);
+  _GMX_DBGLOG("UTIL_SetPlayerIdBySessionId(): %d", iSessionId)
+
+  char szData[16];
+  FormatEx(szData, sizeof(szData), "s%d", iSessionId);
+  int iId = g_hSessions.FindString(szData);
+  if (iId == -1)
+  {
+    return;
+  }
+
+  FormatEx(szData, sizeof(szData), "u%d", iPlayerId);
+  g_hSessions.SetString(iId + 1, szData);
+}
+
+stock int UTIL_GetArrayValueByValDiff(ArrayList hList, any iSearchableValue, int iValueType, any iDefaultValue = 0, int iOffset = 0)
+{
+  _GMX_DBGLOG("UTIL_GetArrayValueByValDiff(): %x -> %d (%d) %d", hList, iSearchableValue, iValueType, iOffset)
+
+  char szData[16];
+  IntToString(iSearchableValue, szData[1], sizeof(szData)-1);
+  switch (iValueType)
+  {
+    case _GAMEX_SESSIONID:  szData[0] = 's';
+    case _GAMEX_PLAYERID:   szData[0] = 'p';
+    case _GAMEX_USERID:     szData[0] = 'u';
+  }
+
+  int iPos = hList.FindString(szData);
   if (iPos == -1)
   {
     return iDefaultValue;
   }
 
-  return hList.Get(iPos + iOffset);
+  hList.GetString(iPos + iOffset, szData, sizeof(szData));
+  return StringToInt(szData[1]);
+}
+
+/**
+ * Assigning
+ */
+public Action Cmd_Assign(int iClient, int iArgC)
+{
+  _GMX_DBGLOG("Cmd_Assign() -> %L %d", iClient, iArgC)
+  if (!iClient)
+  {
+    ReplyToCommand(iClient, "%t%t", GMX_CHATPREFIX, "GameX.Common.InGame");
+    return Plugin_Handled;
+  }
+
+  if (iArgC != 1)
+  {
+    ReplyToCommand(iClient, "%t%t", GMX_CHATPREFIX, "GameX.PM.AssignUsage");
+    return Plugin_Handled;
+  }
+
+  int iUser = UTIL_GetGMXIdByClient(iClient);
+  if (iUser == -1)
+  {
+    ReplyToCommand(iClient, "%t%t %t", GMX_CHATPREFIX, "GameX.Common.DataIsNotReady", "GameX.Common.PleaseTryAgain");
+    return Plugin_Handled;
+  }
+
+  char szToken[64];
+  GetCmdArg(1, szToken, sizeof(szToken));
+
+  JSONObject hRequest = new JSONObject();
+  hRequest.SetInt("id", iUser);
+  hRequest.SetString("token", szToken);
+
+  GameX_DoRequest("player/assign", hRequest, OnAssignUserFinished, GetClientUserId(iClient));
+  hRequest.Close();
+
+  return Plugin_Handled;
+}
+
+public void OnAssignUserFinished(HTTPStatus iStatusCode, JSON hResponse, const char[] szError, int iClient)
+{
+  _GMX_DBGLOG("OnAssignUserFinished(): %d (%L); '%s', %d, %x", iClient, GetClientOfUserId(iClient), szError, iStatusCode, hResponse)
+
+  if ((iClient = GetClientOfUserId(iClient)) == 0)
+  {
+    return;
+  }
+
+  if (szError[0]) {
+    LogError("[GameX Player Manager] Can't assign user account to %L: %s", iClient, szError);
+    ReplyAssignResult(iClient, false);
+    return;
+  }
+
+  if (iStatusCode != HTTPStatus_OK)
+  {
+    LogError("[GameX Player Manager] Can't assign user account to %L: invalid HTTP status code (%d)", iClient, iStatusCode);
+    ReplyAssignResult(iClient, false);
+    return;
+  }
+
+  ReplyAssignResult(iClient, true);
+  int iSessionId = UTIL_GetSessionIdByClient(iClient);
+  if (iSessionId == -1)
+  {
+    return; // it looks like user doesn't loaded too.
+  }
+
+  UTIL_SetPlayerIdBySessionId(iSessionId, _JSONObject(hResponse).GetInt("user_id"));
+}
+
+void ReplyAssignResult(int iClient, bool bSuccess)
+{
+  char szPhraseName[28];
+  FormatEx(szPhraseName, sizeof(szPhraseName), "GameX.PM.AssignResult_%c", bSuccess ? 'Y' : 'N');
+
+  PrintToChat(iClient, "%t%t", GMX_CHATPREFIX, szPhraseName);
 }

@@ -1,0 +1,21 @@
+/**
+ * This file is a part of "GameX" SourceMod plugin.
+ * Licensed by GNU GPL v3.
+ *
+ * All rights reserved.
+ * (c) GameX Dev Team 2018-2019
+ */
+
+"Phrases"
+{
+    "GameX.PM.AssignUsage"
+    {
+        "en"    "Usage: gmx_assign <token>"
+        "ru"    "Использование: gmx_assign <token>"
+    }
+
+    "GameX.PM.AssignResult_N"
+    {
+
+    }
+}

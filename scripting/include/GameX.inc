@@ -24,6 +24,7 @@
  * @section Constants
  */
 #define GAMEX_HOMEPAGE  "https://gm-x.info/"
+stock const char  GMX_CHATPREFIX[]  = "GameX.Common.ChatPrefix";
 
 // Load core.
 #include <GameX/Debug>

@@ -4,10 +4,10 @@ on:
   push:
     paths:
       - '*'
-      - '!/docs/*'
-      - '!/.github/*'
+      - '!docs/*'
+      - '!.github/*'
       - '.github/workflows/*'
-      - '!/.travis.yml'
+      - '!.travis.yml'
       - '!README.md'
       - '!LICENSE'
 
@@ -53,7 +53,7 @@ jobs:
         TARGET: plugins/GameX
         SPCOMP_ARGS: ${{ matrix.parameters }}
       run: |
-        mkdir -p plugins/GameX/optional
+        mkdir -p $TARGET/optional
         ./$SMPATH/spcomp $SPCOMP_ARGS -i$SMPATH/include -i$DEPPATH/rip -i$SOURCES/include -o$TARGET/Core $SOURCES/GameX.sp
         ./$SMPATH/spcomp $SPCOMP_ARGS -i$SMPATH/include -i$DEPPATH/rip -i$SOURCES/include -o$TARGET/PlayerManager $SOURCES/GameX_PlayerManager.sp
         ./$SMPATH/spcomp $SPCOMP_ARGS -i$SMPATH/include -i$DEPPATH/rip -i$SOURCES/include -o$TARGET/ServerInformation $SOURCES/GameX_ServerInformation.sp
