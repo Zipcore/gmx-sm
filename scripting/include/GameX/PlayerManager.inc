@@ -9,6 +9,7 @@
 /**
  * @section Forwards
  */
+
 /**
  * Called when player loaded.
  *
@@ -20,6 +21,7 @@ forward void GameX_OnPlayerLoaded(int iClient, JSONObject hBody);
 /**
  * @section Natives
  */
+
 /**
  * Retrieves the client session id.
  *

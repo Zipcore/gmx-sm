@@ -9,6 +9,7 @@
 /**
  * @section Typedefs
  */
+
 typeset GameXCall
 {
   // Called when request finished.
@@ -32,6 +33,7 @@ typeset GameXCall
 /**
  * @section Forwards
  */
+
 /**
  * Called when GameX perform a reloading by console command.
  * This can be useful, if you cache any configuration settings.
@@ -41,6 +43,7 @@ forward void GameX_OnReload();
 /**
  * @section Natives
  */
+
 /**
  * Retrieves config value if exists.
  *
